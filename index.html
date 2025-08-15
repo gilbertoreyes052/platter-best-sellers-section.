@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Best Sellers - Product Grid</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;900&family=Bebas+Neue:wght@400&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <!-- SimpleBar CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@5.3.9/dist/simplebar.css" />
+  <style>
+    /* Custom font configuration */
+    .font-source-serif {
+      font-family: 'Source Serif Pro', serif;
+    }
+    
+    .font-bebas {
+      font-family: 'Bebas Neue', sans-serif;
+    }
+    
+    .font-poppins {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Best Sellers heading styling */
+    .best-sellers-heading {
+      font-family: 'Source Serif Pro', serif;
+      font-weight: 900;
+      font-style: normal;
+      font-size: 40px;
+      line-height: 120%;
+      letter-spacing: -0.01em; /* -1% */
+    }
+    
+    /* Hide default browser scrollbar for SimpleBar container only */
+    .custom-scrollbar {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* Ensure SimpleBar content area also hides default scrollbar */
+    .custom-scrollbar .simplebar-content-wrapper {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+
+    .custom-scrollbar .simplebar-content-wrapper::-webkit-scrollbar {
+      display: none !important;
+    }
+
+    /* Custom styling for SimpleBar scrollbar */
+    .custom-scrollbar .simplebar-track.simplebar-horizontal {
+      height: 8px !important;
+      background: #ddd6d7 !important; /* Keep this grey - the track/background */
+      border-radius: 2px !important;
+      margin-top: 10px !important;
+      cursor: pointer !important;
+    }
+
+    /* Scrollbar thumb styling - More aggressive approach */
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal {
+      height: 4px !important;
+      top: 2px !important;
+      transition: height 0.2s ease, top 0.2s ease !important;
+      cursor: pointer !important;
+      background: #000000 !important; /* Changed from background-color to background */
+    }
+
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal::before {
+      background: #000000 !important; /* Changed from background-color to background */
+      border-radius: 2px !important;
+      opacity: 1 !important;
+      height: 4px !important;
+      transition: height 0.2s ease !important;
+      top: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      bottom: 0 !important;
+      content: '' !important;
+    }
+
+    /* Also target the scrollbar element directly */
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal .simplebar-scrollbar-drag {
+      background: #000000 !important;
+    }
+
+    /* Force all possible scrollbar elements to be black */
+    .custom-scrollbar [class*="simplebar-scrollbar"] {
+      background: #000000 !important;
+    }
+
+    .custom-scrollbar [class*="simplebar-scrollbar"]::before {
+      background: #000000 !important;
+    }
+
+    /* Hover states for scrollbar thumb */
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:hover,
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal.simplebar-visible {
+      height: 6px !important;
+      top: 1px !important;
+    }
+
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:hover::before,
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal.simplebar-visible::before {
+      height: 6px !important;
+    }
+
+    /* Track hover effect */
+    .custom-scrollbar .simplebar-track.simplebar-horizontal:hover .simplebar-scrollbar {
+      height: 6px !important;
+      top: 1px !important;
+    }
+
+    .custom-scrollbar .simplebar-track.simplebar-horizontal:hover .simplebar-scrollbar::before {
+      height: 6px !important;
+    }
+
+    /* Add active state for touch devices */
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:active,
+    .custom-scrollbar .simplebar-track.simplebar-horizontal:active .simplebar-scrollbar {
+      height: 6px !important;
+      top: 1px !important;
+    }
+
+    .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:active::before,
+    .custom-scrollbar .simplebar-track.simplebar-horizontal:active .simplebar-scrollbar::before {
+      height: 6px !important;
+    }
+
+    /* Hide scrollbar for mobile */
+    @media (max-width: 768px) {
+      .simplebar-track {
+        display: none !important;
+      }
+    }
+    
+    /* Animation for dropdown effect */
+    .dropdown-closed {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease-out;
+    }
+    
+    .dropdown-open {
+      max-height: 2000px;
+      transition: max-height 0.5s ease-in;
+    }
+    
+    /* Product name styling for both desktop and mobile */
+    .product-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 100%;
+      letter-spacing: 0.54px; /* 3% of 18px */
+      text-transform: uppercase;
+    }
+    
+    /* Badge styling for desktop */
+    .product-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 10px;
+      line-height: 100%;
+      letter-spacing: 0.6px; /* 6% of 10px */
+      text-align: center;
+      padding: 0.25rem 0.5rem;
+      border-radius: 9999px;
+      display: inline-block;
+    }
+    
+    .badge-bestseller {
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+    }
+    
+    .badge-save {
+      color: white;
+    }
+    
+    /* Mobile specific styles to match the design in image */
+    @media (max-width: 768px) {
+      .best-sellers-heading {
+        font-size: 32px; /* Smaller size for mobile */
+      }
+      
+      .mobile-product-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 18px;
+        line-height: 100%;
+        letter-spacing: 0.54px; /* 3% of 18px */
+        text-transform: uppercase;
+        margin-bottom: 0.25rem;
+      }
+      
+      .mobile-rating {
+        display: flex;
+        align-items: center;
+        font-size: 0.75rem;
+      }
+      
+      .mobile-rating-stars {
+        color: #000000; /* Changed to black */
+        margin-right: 0.25rem;
+      }
+      
+      .mobile-review-count {
+        color: #757575;
+        font-size: 0.75rem;
+      }
+      
+      .mobile-price {
+        font-weight: 600;
+        margin-top: 0.25rem;
+      }
+      
+      .mobile-badge {
+        font-family: 'Bebas Neue', sans-serif;
+        font-weight: 400;
+        font-style: normal;
+        font-size: 10px;
+        line-height: 100%;
+        letter-spacing: 0.6px; /* 6% of 10px */
+        text-align: center;
+        padding: 0.125rem 0.5rem;
+        border-radius: 9999px;
+        display: inline-block;
+      }
+      
+      .mobile-badge-bestseller {
+        background-color: white;
+        color: black;
+        border: 1px solid black;
+      }
+      
+      .mobile-badge-save {
+        background-color: #5C7962;
+        color: white;
+      }
+      
+      .mobile-show-more-btn {
+        background-color: #000000;
+        color: white;
+        border-radius: 9999px;
+        font-weight: 500;
+        padding: 0.875rem;
+        width: 100%;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+
+<!-- Body -->
+
+
+
+<body class="bg-white font-poppins">
+  <section class="w-full bg-white py-20 md:py-24">
+    <div class="max-w-7xl mx-auto px-8 md:px-32">
+      <!-- Header - Explicitly adding z-index and relative position -->
+      <div class="flex flex-col gap-6 md:gap-9 mb-9 md:mb-12 relative z-10">
+        <div class="flex justify-between items-center">
+          <!-- Updated Best Sellers heading with specific styling -->
+          <h2 class="best-sellers-heading text-neutral-black">
+            Best Sellers
+          </h2>
+          <!-- Desktop Shop All Button -->
+          <button class="hidden md:flex items-center gap-2 px-8 py-4 rounded-full hover:bg-gray-50 transition-colors">
+            <span class="font-poppins text-sm font-semibold text-secondary-default tracking-wider">
+              Shop All Best Sellers
+            </span>
+            <svg
+              class="w-5 h-5 text-secondary-default"
+              viewBox="0 0 20 20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3.33334 10H16.6667M16.6667 10L11.6667 5M16.6667 10L11.6667 15"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <!-- Products Container -->
+      <div class="flex flex-col gap-12">
+        <!-- Desktop: Horizontal scrolling grid with SimpleBar -->
+        <div class="hidden md:block">
+          <div id="products-scrollbar" class="custom-scrollbar pb-4">
+            <div id="desktop-products" class="flex gap-6">
+              <!-- Products will be inserted here by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Mobile: Grid with Show More -->
+        <div class="md:hidden">
+          <div id="mobile-products" class="grid grid-cols-2 gap-4">
+            <!-- Initial 4 products will be inserted here -->
+          </div>
+
+          <!-- Additional Products Container - Initially hidden -->
+          <div
+            id="additional-products"
+            class="grid grid-cols-2 gap-4 mt-4 dropdown-closed"
+          >
+            <!-- Additional products will be inserted here -->
+          </div>
+
+          <!-- Show More Button - Mobile Only -->
+          <div id="show-more-container" class="mt-6">
+            <button
+              id="show-more-btn"
+              class="mobile-show-more-btn"
+            >
+              Show More
+            </button>
+          </div>
+          
+          <!-- Hide button - Initially hidden -->
+          <div id="hide-more-container" class="mt-6 hidden">
+            <button
+              id="hide-more-btn"
+              class="mobile-show-more-btn"
+            >
+              Show Less
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+<!-- VANILLA JAVASCRIPT -->
+
+  <!-- SimpleBar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/simplebar@5.3.9/dist/simplebar.min.js"></script>
+  
+
+
+
+  <script>
+    // Product data array with modified badges
+
+
+    const products = [
+      {
+        id: 1,
+        name: "Outside Vibes T-Shirt Sunshine",
+        price: "$104.95",
+        reviews: 1234,
+        rating: 4.5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=400&fit=crop&crop=center",
+        badges: [{ text: "BEST SELLER", type: "bestseller" }],
+      },
+
+
+
+      {
+        id: 2,
+        name: "Hike Bottle Outside Vibes",
+        price: "$104.95",
+        reviews: 1234,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=400&fit=crop&crop=center",
+        badges: [
+          { text: "BEST SELLER", type: "bestseller" },
+          { text: "SAVE 15%", type: "save", backgroundColor: "#5C7962" },
+        ],
+      },
+
+
+
+      {
+        id: 3,
+        name: "Rest In Nature T-Shirt Charcoal",
+        price: "$104.95",
+        reviews: 1234,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1576566588028-4147f3842f27?w=400&h=400&fit=crop&crop=center",
+        badges: [
+          { text: "BEST SELLER", type: "bestseller" },
+          // Removed SAVE 15% badge for desktop but kept for mobile
+          { text: "SAVE 15%", type: "save", backgroundColor: "#5C7962", mobileOnly: true },
+        ],
+      },
+
+
+
+      {
+        id: 4,
+        name: "Outside Vibes Cap Forest Green",
+        price: "$104.95",
+        reviews: 1234,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1528825871115-3581a5387919?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=400&h=400&fit=crop&crop=center",
+        badges: [
+          { text: "BEST SELLER", type: "bestseller" },
+          // Added SAVE 15% badge for desktop only
+          { text: "SAVE 15%", type: "save", backgroundColor: "#5C7962", desktopOnly: true },
+        ],
+      },
+
+
+
+      {
+        id: 5,
+        name: "Mountain Explorer Backpack",
+        price: "$149.95",
+        reviews: 892,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1622260614153-03223fb72052?w=400&h=400&fit=crop&crop=center",
+        badges: [{ text: "BEST SELLER", type: "bestseller" }],
+      },
+
+
+
+
+      {
+        id: 6,
+        name: "Adventure Hoodie Midnight",
+        price: "$89.95",
+        reviews: 567,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1542406775-ade58c52d2e4?w=400&h=400&fit=crop&crop=center",
+        badges: [
+          { text: "BEST SELLER", type: "bestseller" },
+          { text: "SAVE 20%", type: "save", backgroundColor: "#5C7962" },
+        ],
+      },
+
+
+
+
+      {
+        id: 7,
+        name: "Wilderness Pants Olive",
+        price: "$124.95",
+        reviews: 721,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1711175017307-bbacf7c2ca13?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1691407981600-62ebb537a0f2?w=400&h=400&fit=crop&crop=center",
+        badges: [{ text: "BEST SELLER", type: "bestseller" }],
+      },
+
+
+
+
+      {
+        id: 8,
+        name: "Camp Coffee Mug Steel",
+        price: "$34.95",
+        reviews: 445,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1520031473529-2c06dea61853?w=400&h=400&fit=crop&crop=center",
+        badges: [{ text: "BEST SELLER", type: "bestseller" }],
+      },
+
+
+
+      {
+        id: 9,
+        name: "Trail Runner Shoes Gray",
+        price: "$159.95",
+        reviews: 1108,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1551107696-a4b0c5a0d9a2?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=400&h=400&fit=crop&crop=center",
+        badges: [
+          { text: "BEST SELLER", type: "bestseller" },
+          { text: "SAVE 10%", type: "save", backgroundColor: "#5C7962" },
+        ],
+      },
+
+
+
+      {
+        id: 10,
+        name: "Outdoor Sunglasses Black",
+        price: "$79.95",
+        reviews: 337,
+        rating: 5,
+        primaryImage:
+          "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=400&fit=crop&crop=center",
+        secondaryImage:
+          "https://images.unsplash.com/photo-1508296695146-257a814070b4?w=400&h=400&fit=crop&crop=center",
+        badges: [{ text: "BEST SELLER", type: "bestseller" }],
+      },
+    ];
+
+
+
+    
+    // Function to render stars (desktop version) - now black instead of yellow
+    function renderStars(rating) {
+      let starsHTML = "";
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = rating % 1 !== 0;
+      
+      // Full stars
+      for (let i = 0; i < fullStars; i++) {
+        starsHTML += `
+          <svg
+            class="w-4 h-4 fill-current text-black"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+            />
+          </svg>
+        `;
+      }
+      
+      // Half star if needed
+      if (hasHalfStar) {
+        starsHTML += `
+          <svg class="w-4 h-4 text-black" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="halfStar" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="50%" stop-color="currentColor" />
+                <stop offset="50%" stop-color="transparent" stop-opacity="1" />
+              </linearGradient>
+            </defs>
+            <path
+              fill="url(#halfStar)"
+              stroke="currentColor"
+              stroke-width="0.2"
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+            />
+          </svg>
+        `;
+      }
+      
+      // Empty stars
+      const emptyStars = 5 - Math.ceil(rating);
+      for (let i = 0; i < emptyStars; i++) {
+        starsHTML += `
+          <svg
+            class="w-4 h-4 stroke-current text-black"
+            fill="none"
+            viewBox="0 0 20 20"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-width="1"
+              d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"
+            />
+          </svg>
+        `;
+      }
+      
+      return starsHTML;
+    }
+
+    // Function to render mobile stars with 4.5 rating for the first product
+    function renderMobileStars(productId, rating) {
+      // For Outside Vibes T-Shirt Sunshine (id 1), show 4.5 stars
+      if (productId === 1) {
+        return '★★★★½';
+      } else {
+        return '★★★★★';
+      }
+    }
+
+    // Function to create product card HTML
+    function createProductCard(product, isMobile = false) {
+      // Different HTML for mobile view to match the image
+      if (isMobile) {
+        // Separate badges by type for positioning
+        let bestSellerBadge = '';
+        let saveBadge = '';
+        
+        product.badges.forEach(badge => {
+          // For mobile, we don't filter out desktop-only badges
+          if (badge.type === "bestseller") {
+            bestSellerBadge = '<span class="mobile-badge mobile-badge-bestseller">BEST SELLER</span>';
+          } else if (badge.type === "save" && !badge.desktopOnly) {
+            saveBadge = '<span class="mobile-badge mobile-badge-save">SAVE 15%</span>';
+          }
+        });
+  
+        return `
+          <div class="flex flex-col mb-4">
+            <div class="relative w-full aspect-square rounded-lg overflow-hidden mb-2">
+              <img src="${product.primaryImage}" alt="${product.name}" class="w-full h-full object-cover">
+              
+              <!-- Best Seller Badge - Top Left -->
+              ${bestSellerBadge ? `<div class="absolute top-3 left-3">${bestSellerBadge}</div>` : ''}
+              
+              <!-- Save Badge - Top Right -->
+              ${saveBadge ? `<div class="absolute top-3 right-3">${saveBadge}</div>` : ''}
+            </div>
+  
+            <div class="flex flex-col">
+              <h3 class="mobile-product-title">${product.name}</h3>
+              
+              <div class="mobile-rating">
+                <span class="mobile-rating-stars">${renderMobileStars(product.id, product.rating)}</span>
+                <span class="mobile-review-count">${product.reviews} Reviews</span>
+              </div>
+              
+              <div class="mobile-price">
+                ${product.price}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Desktop version - with special badge handling
+      let bestSellerBadge = '';
+      let saveBadge = '';
+      
+      product.badges.forEach(badge => {
+        if (badge.type === "bestseller") {
+          bestSellerBadge = '<span class="product-badge badge-bestseller">BEST SELLER</span>';
+        } else if (badge.type === "save" && !badge.mobileOnly) {
+          const bgStyle = badge.backgroundColor ? `style="background-color: ${badge.backgroundColor};"` : '';
+          saveBadge = `<span class="product-badge badge-save" ${bgStyle}>${badge.text}</span>`;
+        }
+      });
+      
+      // Special case: Move the SAVE 15% badge to Outside Vibes Cap Forest Green (id 4) on desktop
+      if (product.id === 4) {
+        saveBadge = `<span class="product-badge badge-save" style="background-color: #5C7962;">SAVE 15%</span>`;
+      }
+
+      return `
+        <div class="flex flex-col gap-4 pb-4 flex-none w-[355px]">
+          <div class="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer product-image-container" 
+               data-primary="${product.primaryImage}" 
+               data-secondary="${product.secondaryImage}">
+              <img src="${product.primaryImage}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-300 product-image">
+              
+              <!-- Best Seller Badge - Top Left -->
+              ${bestSellerBadge ? `<div class="absolute top-2 left-2">${bestSellerBadge}</div>` : ''}
+              
+              <!-- Save Badge - Top Right -->
+              ${saveBadge ? `<div class="absolute top-2 right-2">${saveBadge}</div>` : ''}
+          </div>
+
+          <div class="flex flex-col gap-5 px-3">
+              <div class="flex flex-col gap-2">
+                  <h3 class="product-title">
+                      ${product.name}
+                  </h3>
+                  
+                  <div class="flex items-center gap-1">
+                      <div class="flex items-center gap-0.5">
+                          ${renderStars(product.rating)}
+                      </div>
+                      <span class="text-xs text-text-gray font-poppins ml-1">
+                          ${product.reviews.toLocaleString()} Reviews
+                      </span>
+                  </div>
+                  
+                  <div class="font-poppins text-base font-medium text-neutral-dark uppercase">
+                      ${product.price}
+                  </div>
+              </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Function to add image hover functionality
+    function addImageHoverFunctionality() {
+      const imageContainers = document.querySelectorAll(".product-image-container");
+
+      imageContainers.forEach((container) => {
+        const img = container.querySelector(".product-image");
+        const primarySrc = container.dataset.primary;
+        const secondarySrc = container.dataset.secondary;
+
+        container.addEventListener("mouseenter", () => {
+          img.src = secondarySrc;
+        });
+
+        container.addEventListener("mouseleave", () => {
+          img.src = primarySrc;
+        });
+      });
+    }
+
+    // Initialize the page
+    function init() {
+      const desktopContainer = document.getElementById("desktop-products");
+      const mobileContainer = document.getElementById("mobile-products");
+      const additionalContainer = document.getElementById("additional-products");
+      const showMoreContainer = document.getElementById("show-more-container");
+      const hideMoreContainer = document.getElementById("hide-more-container");
+      const showMoreBtn = document.getElementById("show-more-btn");
+      const hideMoreBtn = document.getElementById("hide-more-btn");
+
+      // Render desktop products
+      products.forEach((product) => {
+        desktopContainer.innerHTML += createProductCard(product, false);
+      });
+
+      // Initialize SimpleBar with custom options
+      if (document.getElementById("products-scrollbar")) {
+        new SimpleBar(document.getElementById("products-scrollbar"), {
+          autoHide: false,
+          scrollbarMinSize: 20,
+          scrollbarMaxSize: 200,
+          forceVisible: 'x'
+        });
+      }
+
+      // Render mobile products (first 4)
+      const initialProducts = products.slice(0, 4);
+      const remainingProducts = products.slice(4);
+
+      initialProducts.forEach((product) => {
+        mobileContainer.innerHTML += createProductCard(product, true);
+      });
+
+      // Add remaining products to additional container (initially hidden with dropdown-closed)
+      remainingProducts.forEach((product) => {
+        additionalContainer.innerHTML += createProductCard(product, true);
+      });
+
+      // Show More button functionality - Toggle dropdown
+      showMoreBtn.addEventListener("click", () => {
+        // Show the additional products with dropdown effect
+        additionalContainer.classList.remove("dropdown-closed");
+        additionalContainer.classList.add("dropdown-open");
+        
+        // Hide the Show More button and show the Hide button
+        showMoreContainer.classList.add("hidden");
+        hideMoreContainer.classList.remove("hidden");
+      });
+      
+      // Hide button functionality
+      hideMoreBtn.addEventListener("click", () => {
+        // Hide the additional products with dropdown effect
+        additionalContainer.classList.remove("dropdown-open");
+        additionalContainer.classList.add("dropdown-closed");
+        
+        // Show the Show More button and hide the Hide button
+        hideMoreContainer.classList.add("hidden");
+        showMoreContainer.classList.remove("hidden");
+        
+        // Scroll back to the top of the products section
+        mobileContainer.scrollIntoView({ behavior: "smooth" });
+      });
+
+      // Add image hover functionality (for desktop only)
+      addImageHoverFunctionality();
+    }
+
+    // Wait for DOM to be fully loaded
+    document.addEventListener("DOMContentLoaded", init);
+  </script>
+</body>
+</html>

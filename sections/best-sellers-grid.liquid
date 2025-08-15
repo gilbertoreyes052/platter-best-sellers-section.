@@ -1,0 +1,737 @@
+<!-- filepath: sections/best-sellers-grid.liquid -->
+{% comment %}
+  Best Sellers Grid - Shopify Section
+  Shows products from a collection with horizontal scroll on desktop
+  and show more/less on mobile with custom scrollbar
+{% endcomment %}
+
+<!-- Include required external dependencies -->
+{{ 'https://cdn.tailwindcss.com' | script_tag }}
+{{ 'https://cdn.jsdelivr.net/npm/simplebar@5.3.9/dist/simplebar.css' | stylesheet_tag }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+Pro:wght@400;900&family=Bebas+Neue:wght@400&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+  /* Custom font configuration */
+  .font-source-serif {
+    font-family: 'Source Serif Pro', serif;
+  }
+  
+  .font-bebas {
+    font-family: 'Bebas Neue', sans-serif;
+  }
+  
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  /* Best Sellers heading styling */
+  .best-sellers-heading {
+    font-family: 'Source Serif Pro', serif;
+    font-weight: 900;
+    font-style: normal;
+    font-size: 40px;
+    line-height: 120%;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Hide default browser scrollbar for SimpleBar container only */
+  .custom-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Ensure SimpleBar content area also hides default scrollbar */
+  .custom-scrollbar .simplebar-content-wrapper {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  .custom-scrollbar .simplebar-content-wrapper::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* Custom styling for SimpleBar scrollbar */
+  .custom-scrollbar .simplebar-track.simplebar-horizontal {
+    height: 8px !important;
+    background: #ddd6d7 !important;
+    border-radius: 2px !important;
+    margin-top: 10px !important;
+    cursor: pointer !important;
+  }
+
+  /* Main scrollbar thumb - starts at 4px height */
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal {
+    height: 4px !important;
+    top: 2px !important;
+    transition: height 0.2s ease, top 0.2s ease !important;
+    cursor: pointer !important;
+    background: #000000 !important;
+  }
+
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal::before {
+    background: #000000 !important;
+    border-radius: 2px !important;
+    opacity: 1 !important;
+    height: 4px !important;
+    transition: height 0.2s ease !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    content: '' !important;
+  }
+
+  /* Also target the scrollbar element directly */
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal .simplebar-scrollbar-drag {
+    background: #000000 !important;
+  }
+
+  /* Target multiple elements to ensure black color sticks */
+  .custom-scrollbar [class*="simplebar-scrollbar"] {
+    background: #000000 !important;
+  }
+
+  .custom-scrollbar [class*="simplebar-scrollbar"]::before {
+    background: #000000 !important;
+  }
+
+  /* Hover effect - grows to 6px when you hover over it */
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:hover,
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal.simplebar-visible {
+    height: 6px !important;
+    top: 1px !important;
+  }
+
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:hover::before,
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal.simplebar-visible::before {
+    height: 6px !important;
+  }
+
+  /* Track hover effect */
+  .custom-scrollbar .simplebar-track.simplebar-horizontal:hover .simplebar-scrollbar {
+    height: 6px !important;
+    top: 1px !important;
+  }
+
+  .custom-scrollbar .simplebar-track.simplebar-horizontal:hover .simplebar-scrollbar::before {
+    height: 6px !important;
+  }
+
+  /* Touch support for mobile devices */
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:active,
+  .custom-scrollbar .simplebar-track.simplebar-horizontal:active .simplebar-scrollbar {
+    height: 6px !important;
+    top: 1px !important;
+  }
+
+  .custom-scrollbar .simplebar-scrollbar.simplebar-horizontal:active::before,
+  .custom-scrollbar .simplebar-track.simplebar-horizontal:active .simplebar-scrollbar::before {
+    height: 6px !important;
+  }
+
+  /* Hide scrollbar on mobile since touch scrolling works fine */
+  @media (max-width: 768px) {
+    .simplebar-track {
+      display: none !important;
+    }
+  }
+  
+  /* Smooth dropdown animation for mobile show more */
+  .dropdown-closed {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+  }
+  
+  .dropdown-open {
+    max-height: 2000px;
+    transition: max-height 0.5s ease-in;
+  }
+  
+  /* Product name styling for both desktop and mobile */
+  .product-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 18px;
+    line-height: 100%;
+    letter-spacing: 0.54px;
+    text-transform: uppercase;
+  }
+  
+  /* Badge styling for desktop */
+  .product-badge {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 10px;
+    line-height: 100%;
+    letter-spacing: 0.6px;
+    text-align: center;
+    padding: 0.25rem 0.5rem;
+    border-radius: 9999px;
+    display: inline-block;
+  }
+  
+  .badge-bestseller {
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+  }
+  
+  .badge-save {
+    color: white;
+  }
+  
+  /* Mobile specific styles */
+  @media (max-width: 768px) {
+    .best-sellers-heading {
+      font-size: 32px;
+    }
+    
+    .mobile-product-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 100%;
+      letter-spacing: 0.54px;
+      text-transform: uppercase;
+      margin-bottom: 0.25rem;
+    }
+    
+    .mobile-rating {
+      display: flex;
+      align-items: center;
+      font-size: 0.75rem;
+    }
+    
+    .mobile-rating-stars {
+      color: #000000;
+      margin-right: 0.25rem;
+    }
+    
+    .mobile-review-count {
+      color: #757575;
+      font-size: 0.75rem;
+    }
+    
+    .mobile-price {
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+    
+    .mobile-badge {
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 10px;
+      line-height: 100%;
+      letter-spacing: 0.6px;
+      text-align: center;
+      padding: 0.125rem 0.5rem;
+      border-radius: 9999px;
+      display: inline-block;
+    }
+    
+    .mobile-badge-bestseller {
+      background-color: white;
+      color: black;
+      border: 1px solid black;
+    }
+    
+    .mobile-badge-save {
+      background-color: #5C7962;
+      color: white;
+    }
+    
+    .mobile-show-more-btn {
+      background-color: #000000;
+      color: white;
+      border-radius: 9999px;
+      font-weight: 500;
+      padding: 0.875rem;
+      width: 100%;
+      text-align: center;
+    }
+  }
+</style>
+
+
+
+
+
+
+
+
+
+<!-- Main section HTML -->
+<section class="w-full bg-white py-20 md:py-24" id="best-sellers-{{ section.id }}">
+  <div class="max-w-7xl mx-auto px-8 md:px-32">
+    <!-- Header -->
+    <div class="flex flex-col gap-6 md:gap-9 mb-9 md:mb-12 relative z-10">
+      <div class="flex justify-between items-center">
+        <h2 class="best-sellers-heading text-neutral-black">
+          {{ section.settings.heading }}
+        </h2>
+        
+        <!-- Desktop Shop All Button -->
+        {% if section.settings.show_shop_all and section.settings.shop_all_url != blank %}
+          <a href="{{ section.settings.shop_all_url }}" 
+             class="hidden md:flex items-center gap-2 px-8 py-4 rounded-full hover:bg-gray-50 transition-colors">
+            <span class="font-poppins text-sm font-semibold text-secondary-default tracking-wider">
+              {{ section.settings.shop_all_text }}
+            </span>
+            <svg class="w-5 h-5 text-secondary-default" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M3.33334 10H16.6667M16.6667 10L11.6667 5M16.6667 10L11.6667 15" 
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Products Container -->
+    <div class="flex flex-col gap-12">
+      <!-- Desktop: Horizontal scrolling grid -->
+      <div class="hidden md:block">
+        <div id="products-scrollbar-{{ section.id }}" class="custom-scrollbar pb-4">
+          <div id="desktop-products-{{ section.id }}" class="flex gap-6">
+            <!-- Products will be inserted here by JavaScript -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile: Grid with Show More -->
+      <div class="md:hidden">
+        <div id="mobile-products-{{ section.id }}" class="grid grid-cols-2 gap-4">
+          <!-- Initial products will be inserted here -->
+        </div>
+
+        <div id="additional-products-{{ section.id }}" class="grid grid-cols-2 gap-4 mt-4 dropdown-closed">
+          <!-- Additional products will be inserted here -->
+        </div>
+
+        <div id="show-more-container-{{ section.id }}" class="mt-6">
+          <button id="show-more-btn-{{ section.id }}" class="mobile-show-more-btn">
+            {{ section.settings.show_more_text }}
+          </button>
+        </div>
+        
+        <div id="hide-more-container-{{ section.id }}" class="mt-6 hidden">
+          <button id="hide-more-btn-{{ section.id }}" class="mobile-show-more-btn">
+            {{ section.settings.show_less_text }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+
+
+
+
+
+
+<!-- Include SimpleBar JS -->
+{{ 'https://cdn.jsdelivr.net/npm/simplebar@5.3.9/dist/simplebar.min.js' | script_tag }}
+
+
+
+<!-- Section JavaScript -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Get products from Shopify collection
+    {% assign collection = collections[section.settings.collection] %}
+    {% assign products_to_show = section.settings.products_count %}
+    
+    const products = [
+      {% for product in collection.products limit: products_to_show %}
+      {
+        id: {{ product.id }},
+        name: "{{ product.title | escape }}",
+        price: "{{ product.price | money }}",
+        reviews: {{ product.metafields.reviews.count | default: 1234 }},
+        rating: {{ product.metafields.reviews.rating | default: 5 }},
+        primaryImage: "{{ product.featured_image | img_url: '400x400' }}",
+        secondaryImage: "{{ product.images[1] | default: product.featured_image | img_url: '400x400' }}",
+        url: "{{ product.url }}",
+        badges: [
+          {% if product.tags contains 'bestseller' or section.settings.show_bestseller_badge %}
+          { text: "{{ section.settings.bestseller_text }}", type: "bestseller" }{% if product.compare_at_price > product.price %},{% endif %}
+          {% endif %}
+          {% if product.compare_at_price > product.price %}
+          { 
+            text: "SAVE {{ product.compare_at_price | minus: product.price | times: 100 | divided_by: product.compare_at_price }}%", 
+            type: "save", 
+            backgroundColor: "{{ section.settings.save_badge_color }}" 
+          }
+          {% endif %}
+        ]
+      }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ];
+    
+
+
+    // Initialize the section with unique ID
+    initBestSellers('{{ section.id }}', products);
+  });
+  
+  // Function to render stars (desktop version) - black stars
+  function renderStars(rating) {
+    let starsHTML = "";
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    
+
+
+
+    // Full stars
+    for (let i = 0; i < fullStars; i++) {
+      starsHTML += `
+        <svg class="w-4 h-4 fill-current text-black" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+      `;
+    }
+    
+
+
+
+    // Half star if needed
+    if (hasHalfStar) {
+      starsHTML += `
+        <svg class="w-4 h-4 text-black" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="halfStar" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="50%" stop-color="currentColor" />
+              <stop offset="50%" stop-color="transparent" stop-opacity="1" />
+            </linearGradient>
+          </defs>
+          <path fill="url(#halfStar)" stroke="currentColor" stroke-width="0.2" 
+                d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+      `;
+    }
+    
+
+
+
+    // Empty stars
+    const emptyStars = 5 - Math.ceil(rating);
+    for (let i = 0; i < emptyStars; i++) {
+      starsHTML += `
+        <svg class="w-4 h-4 stroke-current text-black" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-width="1" d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+      `;
+    }
+    
+    return starsHTML;
+  }
+
+
+
+
+
+
+  // Function to render mobile stars with 4.5 rating for the first product
+  function renderMobileStars(productId, rating) {
+    if (productId === 1) {
+      return '★★★★½';
+    } else {
+      return '★★★★★';
+    }
+  }
+
+
+
+
+
+
+  // Function to create product card HTML
+  function createProductCard(product, isMobile = false) {
+    if (isMobile) {
+      let bestSellerBadge = '';
+      let saveBadge = '';
+      
+      product.badges.forEach(badge => {
+        if (badge.type === "bestseller") {
+          bestSellerBadge = '<span class="mobile-badge mobile-badge-bestseller">BEST SELLER</span>';
+        } else if (badge.type === "save" && !badge.desktopOnly) {
+          saveBadge = '<span class="mobile-badge mobile-badge-save">SAVE 15%</span>';
+        }
+      });
+
+      return `
+        <a href="${product.url}" class="flex flex-col mb-4">
+          <div class="relative w-full aspect-square rounded-lg overflow-hidden mb-2">
+            <img src="${product.primaryImage}" alt="${product.name}" class="w-full h-full object-cover">
+            ${bestSellerBadge ? `<div class="absolute top-3 left-3">${bestSellerBadge}</div>` : ''}
+            ${saveBadge ? `<div class="absolute top-3 right-3">${saveBadge}</div>` : ''}
+          </div>
+
+          <div class="flex flex-col">
+            <h3 class="mobile-product-title">${product.name}</h3>
+            <div class="mobile-rating">
+              <span class="mobile-rating-stars">${renderMobileStars(product.id, product.rating)}</span>
+              <span class="mobile-review-count">${product.reviews} Reviews</span>
+            </div>
+            <div class="mobile-price">${product.price}</div>
+          </div>
+        </a>
+      `;
+    }
+
+
+
+
+
+
+    
+    // Desktop version
+    let bestSellerBadge = '';
+    let saveBadge = '';
+    
+    product.badges.forEach(badge => {
+      if (badge.type === "bestseller") {
+        bestSellerBadge = '<span class="product-badge badge-bestseller">BEST SELLER</span>';
+      } else if (badge.type === "save" && !badge.mobileOnly) {
+        const bgStyle = badge.backgroundColor ? `style="background-color: ${badge.backgroundColor};"` : '';
+        saveBadge = `<span class="product-badge badge-save" ${bgStyle}>${badge.text}</span>`;
+      }
+    });
+
+    return `
+      <a href="${product.url}" class="flex flex-col gap-4 pb-4 flex-none w-[355px]">
+        <div class="relative w-full aspect-square rounded-lg overflow-hidden bg-gray-100 cursor-pointer product-image-container" 
+             data-primary="${product.primaryImage}" 
+             data-secondary="${product.secondaryImage}">
+            <img src="${product.primaryImage}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-300 product-image">
+            ${bestSellerBadge ? `<div class="absolute top-2 left-2">${bestSellerBadge}</div>` : ''}
+            ${saveBadge ? `<div class="absolute top-2 right-2">${saveBadge}</div>` : ''}
+        </div>
+
+        <div class="flex flex-col gap-5 px-3">
+            <div class="flex flex-col gap-2">
+                <h3 class="product-title">${product.name}</h3>
+                
+                <div class="flex items-center gap-1">
+                    <div class="flex items-center gap-0.5">${renderStars(product.rating)}</div>
+                    <span class="text-xs text-text-gray font-poppins ml-1">${product.reviews.toLocaleString()} Reviews</span>
+                </div>
+                
+                <div class="font-poppins text-base font-medium text-neutral-dark uppercase">${product.price}</div>
+            </div>
+        </div>
+      </a>
+    `;
+  }
+
+
+
+
+
+  // Function to add image hover functionality
+  function addImageHoverFunctionality() {
+    const imageContainers = document.querySelectorAll(".product-image-container");
+
+    imageContainers.forEach((container) => {
+      const img = container.querySelector(".product-image");
+      const primarySrc = container.dataset.primary;
+      const secondarySrc = container.dataset.secondary;
+
+      container.addEventListener("mouseenter", () => {
+        img.src = secondarySrc;
+      });
+
+      container.addEventListener("mouseleave", () => {
+        img.src = primarySrc;
+      });
+    });
+  }
+
+
+
+
+  // Main initialization function
+  function initBestSellers(sectionId, products) {
+    const desktopContainer = document.getElementById(`desktop-products-${sectionId}`);
+    const mobileContainer = document.getElementById(`mobile-products-${sectionId}`);
+    const additionalContainer = document.getElementById(`additional-products-${sectionId}`);
+    const showMoreContainer = document.getElementById(`show-more-container-${sectionId}`);
+    const hideMoreContainer = document.getElementById(`hide-more-container-${sectionId}`);
+    const showMoreBtn = document.getElementById(`show-more-btn-${sectionId}`);
+    const hideMoreBtn = document.getElementById(`hide-more-btn-${sectionId}`);
+
+
+
+    // Render desktop products
+    products.forEach((product) => {
+      desktopContainer.innerHTML += createProductCard(product, false);
+    });
+
+
+
+
+    // Initialize SimpleBar
+    const scrollbarElement = document.getElementById(`products-scrollbar-${sectionId}`);
+    if (scrollbarElement) {
+      new SimpleBar(scrollbarElement, {
+        autoHide: false,
+        scrollbarMinSize: 20,
+        scrollbarMaxSize: 200,
+        forceVisible: 'x'
+      });
+    }
+
+
+
+    // Render mobile products (first 4)
+    const initialProducts = products.slice(0, 4);
+    const remainingProducts = products.slice(4);
+
+    initialProducts.forEach((product) => {
+      mobileContainer.innerHTML += createProductCard(product, true);
+    });
+
+    remainingProducts.forEach((product) => {
+      additionalContainer.innerHTML += createProductCard(product, true);
+    });
+
+
+
+    // Show More functionality
+    showMoreBtn.addEventListener("click", () => {
+      additionalContainer.classList.remove("dropdown-closed");
+      additionalContainer.classList.add("dropdown-open");
+      showMoreContainer.classList.add("hidden");
+      hideMoreContainer.classList.remove("hidden");
+    });
+
+    hideMoreBtn.addEventListener("click", () => {
+      additionalContainer.classList.remove("dropdown-open");
+      additionalContainer.classList.add("dropdown-closed");
+      hideMoreContainer.classList.add("hidden");
+      showMoreContainer.classList.remove("hidden");
+      mobileContainer.scrollIntoView({ behavior: "smooth" });
+    });
+
+    
+    // Add image hover functionality
+    addImageHoverFunctionality();
+  }
+</script>
+
+
+
+
+
+
+{% comment %} SHOPIFY SCHEMA  {% endcomment %}
+
+{% schema %}
+{
+  "name": "Best Sellers Grid",
+  "tag": "section",
+  "class": "best-sellers-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Best Sellers Collection",
+      "info": "Choose which collection to display as best sellers"
+    },
+    {
+      "type": "range",
+      "id": "products_count",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "label": "Number of products to show"
+    },
+    {
+      "type": "header",
+      "content": "Content Settings"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "default": "Best Sellers",
+      "label": "Section Heading"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shop_all",
+      "default": true,
+      "label": "Show 'Shop All' button"
+    },
+    {
+      "type": "text",
+      "id": "shop_all_text",
+      "default": "Shop All Best Sellers",
+      "label": "Shop All Button Text"
+    },
+    {
+      "type": "url",
+      "id": "shop_all_url",
+      "label": "Shop All Button URL"
+    },
+    {
+      "type": "text",
+      "id": "show_more_text",
+      "default": "Show More",
+      "label": "Show More Button Text"
+    },
+    {
+      "type": "text",
+      "id": "show_less_text",
+      "default": "Show Less",
+      "label": "Show Less Button Text"
+    },
+    {
+      "type": "header",
+      "content": "Badge Settings"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bestseller_badge",
+      "default": true,
+      "label": "Show bestseller badges"
+    },
+    {
+      "type": "text",
+      "id": "bestseller_text",
+      "default": "BEST SELLER",
+      "label": "Bestseller Badge Text"
+    },
+    {
+      "type": "color",
+      "id": "save_badge_color",
+      "default": "#5C7962",
+      "label": "Save Badge Background Color"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Best Sellers Grid"
+    }
+  ]
+}
+{% endschema %}
